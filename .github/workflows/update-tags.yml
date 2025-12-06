@@ -1,0 +1,141 @@
+name: Create Signed Release Tag
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-tags:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── 1. Determine next version using your exact Conventional Commits ──
+      - name: Conventional Commits → Next Version
+        id: version
+        uses: TriPSs/conventional-changelog-action@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          tag-prefix: "v"
+          skip-on-empty: true          # don't create tag if no feat/fix/breaking
+          release-count: 0
+
+      - name: No release needed
+        if: steps.version.outputs.skipped == 'true'
+        run: |
+          echo "No feat, fix or breaking changes → no tag created."
+          exit 0
+
+      # ── 2. Create isolated GPG environment & import your private key ──
+      - name: Import GPG Private Key
+        id: gpg
+        shell: bash
+        run: |
+          set -euo pipefail
+          GNUPGHOME=$(mktemp -d /tmp/XXXXXXX)
+          touch "$GNUPGHOME/pubring.kbx"
+          echo "GNUPGHOME=$GNUPGHOME" >> $GITHUB_ENV
+          echo "gpg-home=$GNUPGHOME" >> $GITHUB_OUTPUT
+          
+          # Decrypt and import
+          openssl aes-256-cbc -a -d -pbkdf2 \
+            -in <(echo "${{ secrets.GPG_PRIVATE_KEY }}") \
+            -pass "pass:${{ secrets.GPG_PASSPHRASE }}" | \
+            gpg --no-tty --batch --homedir "$GNUPGHOME" --import
+          
+          # Trust the key ultimately (required for signing)
+          echo "${{ secrets.GPG_PRIVATE_KEY_ID }}:6:" | gpg --import-ownertrust --homedir "$GNUPGHOME"
+
+          echo "Your GPG key ${{ secrets.GPG_PRIVATE_KEY_ID }} imported and fully trusted."
+
+      # ── 3. Force Git to always sign with your key ──
+      - name: Configure Git for mandatory GPG signing
+        run: |
+          git config --global user.name  "DCx7C5"
+          git config --global user.email "dcxdevelopment@protonmail.com"
+          git config --global user.signingkey "${{ secrets.GPG_PRIVATE_KEY_ID }}"
+          git config --global commit.gpgsign true
+          git config --global tag.gpgSign true
+          git config --global tag.forceSignAnnotated true
+          git config --global gpg.program gpg
+
+      - name: Get next version
+        id: get_next_version
+        if: steps.check_commit.outputs.has_release_keyword == 'true'
+        uses: thenativeweb/get-next-version@2.6.0
+
+      # ── 4. Create & push signed tag (100% guaranteed signed) ──
+      - name: Create and push tag
+        id: create_tag
+        if: steps.check_commit.outputs.has_release_keyword == 'true' && steps.get_next_version.outputs.hasNextVersion == 'true'
+        run: |
+          set -euo pipefail
+          TAG="v${{ steps.version.outputs.version }}"
+          echo "Creating signed tag $TAG ..."
+          
+          git tag -a "$TAG" -m "Release $TAG" -s
+          git push origin "$TAG"
+          echo "NEW_TAG=$TAG" >> $GITHUB_ENV
+
+          echo "Signed tag $TAG created and pushed."
+
+      # ── 5. Create GitHub Release with changelog ──
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release v${{ steps.version.outputs.version }}
+          body: ${{ steps.version.outputs.changelog }}
+          draft: false
+          prerelease: false
+
+      # ── 6. Summary ──
+      - name: Release summary
+        run: |
+          cat <<EOF >> $GITHUB_STEP_SUMMARY
+          # Released v${{ steps.version.outputs.version }}
+
+          Signed with GPG key **${{ secrets.GPG_PRIVATE_KEY_ID }}**
+
+          ### Changelog
+          ${{ steps.version.outputs.changelog }}
+          EOF
+
+      - name: Send Telegram Release Notification
+        uses: DCx7C5/telegram-notify-action@main   # or @v1 after first release
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          to: ${{ secrets.TELEGRAM_TO }}
+          message: |
+            New signed release published! 
+
+            *Repository:* ${{ github.repository }}
+            *Tag:* `${{ env.NEW_TAG }}`
+            *Signed with:* ${{ vars.GPG_KEY_ID }}
+
+            *Release notes:*
+            ${{ steps.version.outputs.changelog }}
+
+            View release: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ env.NEW_TAG }}
+
+      - name: Telegram on workflow failure
+        if: failure()
+        uses: DCx7C5/telegram-notify-action@main
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          to: ${{ secrets.TELEGRAM_TO }}
+          message: |
+            Release workflow FAILED 
+
+            *Repo:* ${{ github.repository }}
+            *Branch:* ${{ github.ref_name }}
+            *Run:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
