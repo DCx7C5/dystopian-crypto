@@ -1,0 +1,16 @@
+{
+  "defaultRootCA": "",
+  "defaultCA": "",
+  "defaultMOK": "",
+  "defaultGpgKey": "",
+  "defaultSigning": "",
+  "defaultEncrypt": "",
+  "defaultAuth": "",
+  "ssl": {
+    "encrypted": {},
+    "certs": {},
+    "rootCAs": {},
+    "intermediateCAs": {}
+  },
+  "gpg": {}
+}
