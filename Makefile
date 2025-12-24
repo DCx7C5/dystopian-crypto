@@ -27,10 +27,12 @@ setup-crypto-part:
 	install -dm755 /var/lib/dystopian || true
 	install -dm700 /var/lib/dystopian/crypto
 	install -Dm600 conf/data.json /var/lib/dystopian/crypto/data.json
+	install -Dm600 conf/crypto.config /etc/dystopian/crypto/crypto.config
 
 remove-crypto:
 	rm -f $(PREFIX)/bin/dystopian-crypto
 	rm -f /var/lib/dystopian/crypto/data.json
+	rm -f /etc/dystopian/crypto/crypto.config
 	rmdir /etc/dystopian/crypto/ca/private || true
 	rmdir /etc/dystopian/crypto/ca || true
 	rmdir /etc/dystopian/crypto/cert/private || true

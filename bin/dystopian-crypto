@@ -9,16 +9,21 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
+DYSTOPIAN_CFGDIR="/etc/dystopian"
+DYSTOPIAN_LIBDIR="/usr/lib/dystopian"
+DYSTOPIAN_DATADIR="/var/lib/dystopian"
+DYSTOPIAN_USER="root"
+DC_POS_ARGS=
+
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
-VAR_LIB_FILE="$DYSTOPIAN_LIBDIR/variables.sh"
 HELPER_LIB_FILE="$DYSTOPIAN_LIBDIR/libhelper.sh"
 SSL_LIB_FILE="$DYSTOPIAN_LIBDIR/libssl.sh"
 GPG_LIB_FILE="$DYSTOPIAN_LIBDIR/libgpg.sh"
 DCS_DB_LIB_FILE="$DYSTOPIAN_LIBDIR/libssl-db.sh"
 DCG_DB_LIB_FILE="$DYSTOPIAN_LIBDIR/libgpg-db.sh"
 
-DC_CFGDIR="/etc/dystopian/crypto"
-DC_DATADIR="/var/lib/dystopian/crypto"
+DC_CFGDIR="$DYSTOPIAN_CFGDIR/crypto"
+DC_DATADIR="$DYSTOPIAN_DATADIR/crypto"
 DC_CA="$DC_CFGDIR/ca"
 DC_CERT="$DC_CFGDIR/cert"
 DC_KEY="$DC_CFGDIR/private"
@@ -27,18 +32,16 @@ DC_CAKEY="$DC_CFGDIR/private"
 DC_OLD="$DC_CFGDIR/old"
 DC_GNUPG="$DC_CFGDIR/gnupg"
 DC_DB="$DC_DATADIR/data.json"
+DC_CFG_FILE="$DC_CFGDIR/default.conf"
 
-[ -f "$VAR_LIB_FILE" ] || VAR_LIB_FILE="$SCRIPT_DIR/../../dystopian-libs/lib/variables.sh"
 [ -f "$HELPER_LIB_FILE" ] || HELPER_LIB_FILE="$SCRIPT_DIR/../../dystopian-libs/lib/libhelper.sh"
 [ -f "$SSL_LIB_FILE" ] || SSL_LIB_FILE="$SCRIPT_DIR/../../dystopian-libs/lib/libssl.sh"
 [ -f "$GPG_LIB_FILE" ] || GPG_LIB_FILE="$SCRIPT_DIR/../../dystopian-libs/lib/libgpg.sh"
 [ -f "$DCS_DB_LIB_FILE" ] || DCS_DB_LIB_FILE="$SCRIPT_DIR/../../dystopian-libs/lib/libssl-db.sh"
 [ -f "$DCG_DB_LIB_FILE" ] || DCG_DB_LIB_FILE="$SCRIPT_DIR/../../dystopian-libs/lib/libgpg-db.sh"
-
+[ -f "$DC_CFG_FILE" ] || DC_CFG_FILE="$SCRIPT_DIR/../conf/default.conf"
 
 # Source library files
-# shellcheck source=../../dystopian-libs/lib/variables.sh
-[ -f "$VAR_LIB_FILE" ] && . "$VAR_LIB_FILE"
 # shellcheck source=../../dystopian-libs/lib/libhelper.sh
 [ -f "$HELPER_LIB_FILE" ] && . "$HELPER_LIB_FILE"
 # shellcheck source=../../dystopian-libs/lib/libssl.sh
@@ -49,11 +52,14 @@ DC_DB="$DC_DATADIR/data.json"
 [ -f "$DCS_DB_LIB_FILE" ] && . "$DCS_DB_LIB_FILE"
 # shellcheck source=../../dystopian-libs/lib/libgpg-db.sh
 [ -f "$DCG_DB_LIB_FILE" ] && . "$DCG_DB_LIB_FILE"
+# shellcheck source=conf/crypto.config
+[ -f "$DC_CFG_FILE" ] && . "$DC_CFG_FILE"
 trap on_exit EXIT
 
-VERBOSE=0
-DEBUG=0
-QUIET=0
+: "${VERBOSE:=0}"
+: "${DEBUG:=0}"
+: "${QUIET:=0}"
+: "${USB_STORAGE:=0}"
 RAND="$(od -An -N2 -i /dev/urandom | tr -d ' ' | head -c 4)"
 
 
