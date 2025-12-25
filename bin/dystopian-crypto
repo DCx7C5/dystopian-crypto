@@ -99,6 +99,7 @@ SSL Commands:
     --root-ca-salt <file>:              (Optional) Root CA salt file
     --set-as-default:                   (Optional) Set as default CA
     --set-as-defaultRoot:               (Optional) Set as default root CA
+    --rsa|--usersa|-rsa|--use-rsa:      (Optional) Uses RSA instead of Elliptic Curve (default: false)
 
   ssl create-key                      Create a private key
     --name <string>:                    (Optional) Name for the key
@@ -106,6 +107,7 @@ SSL Commands:
     --password <file|string>:           (Optional) Password for private key encryption (default: Argon2id)
     --salt <file>:                      (Optional) Output file for salt
     --no-argon:                         (Optional) Use PBKDF2 instead of Argon2id for key derivation
+    --rsa|--usersa|-rsa|--use-rsa:      (Optional) Uses RSA instead of Elliptic Curve (default: false)
 
   ssl create-csr                      Create a Certificate Signing Request (CSR)
     --name <string>:                    (Optional) Name for the key
@@ -349,7 +351,7 @@ case "$1" in
         keep_ca_csr="" intermediate="" root_ca_name="" root_ca_key=""
         root_ca_cert="" root_ca_pass="" root_ca_salt="" root_no_argon=""
         email="" country="" state="" locality="" organization=""
-        orgunit="" days="" set_as_default="" set_as_defaultRoot="" use_rsa=""
+        orgunit="" days="" set_as_default="" set_as_defaultRoot="" use_rsa="" install_trusts=""
         while [ $# -gt 0 ]; do
           case "$1" in
             --certout|--cert-out|--cert|--crt|-crt) ca_cert_out="$2"; shift 2 ;;
@@ -377,6 +379,7 @@ case "$1" in
             --orgunit|-OU) orgunit="$2"; shift 2;;
             --days|-d) days="$2"; shift 2;;
             --rsa|--usersa|-rsa|--use-rsa) use_rsa=true; shift;;
+            --install|--install-trust|--trusts|--trust) install_trusts="$2"; shift 2;;
             -h|--help|-help|help) shorthelp "ssl create-ca"; exit 0;;
             *) echoe "Unknown command: $1"; shorthelp "ssl create-ca"; exit 1;;
           esac
@@ -389,7 +392,8 @@ case "$1" in
           "$locality" "$organization" "$orgunit" "$days" \
           "$root_ca_name" "$root_ca_key" "$root_ca_cert" \
           "$root_ca_pass" "$root_ca_salt" "$root_no_argon" \
-          "$set_as_default" "$set_as_defaultRoot" "" "$use_rsa"
+          "$set_as_default" "$set_as_defaultRoot" "" \
+          "$use_rsa" "$install_trusts"
         ;;
 
       create-key)
@@ -733,8 +737,8 @@ case "$1" in
             name="" stores=""
             while [ $# -gt 0 ]; do
               case "$1" in
-                --name) name="$2"; shift;;
-                --stores) stores="$2"; shift;;
+                --name) name="$2"; shift 2;;
+                --stores) stores="$2"; shift 2;;
                 *) echoe "Unknown command: $1"; shorthelp "ssl install"; exit 1;;
               esac
             done
