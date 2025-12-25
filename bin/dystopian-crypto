@@ -12,7 +12,7 @@ fi
 DYSTOPIAN_CFGDIR="/etc/dystopian"
 DYSTOPIAN_LIBDIR="/usr/lib/dystopian"
 DYSTOPIAN_DATADIR="/var/lib/dystopian"
-DYSTOPIAN_USER="root"
+DYSTOPIAN_USER="$([ -n "$SUDO_USER" ] && echo "$SUDO_USER" || echo "root")"
 DC_POS_ARGS=
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
@@ -344,7 +344,7 @@ case "$1" in
         keep_ca_csr="" intermediate="" root_ca_name="" root_ca_key=""
         root_ca_cert="" root_ca_pass="" root_ca_salt="" root_no_argon=""
         email="" country="" state="" locality="" organization=""
-        orgunit="" days="" set_as_default="" set_as_defaultRoot=""
+        orgunit="" days="" set_as_default="" set_as_defaultRoot="" use_rsa=""
         while [ $# -gt 0 ]; do
           case "$1" in
             --certout|--cert-out|--cert|--crt|-crt) ca_cert_out="$2"; shift 2 ;;
@@ -371,6 +371,7 @@ case "$1" in
             --org|-O|-o) organization="$2"; shift 2;;
             --orgunit|-OU) orgunit="$2"; shift 2;;
             --days|-d) days="$2"; shift 2;;
+            --rsa|--usersa|-rsa|--use-rsa) use_rsa=true; shift;;
             -h|--help|-help|help) shorthelp "ssl create-ca"; exit 0;;
             *) echoe "Unknown command: $1"; shorthelp "ssl create-ca"; exit 1;;
           esac
@@ -383,13 +384,13 @@ case "$1" in
           "$locality" "$organization" "$orgunit" "$days" \
           "$root_ca_name" "$root_ca_key" "$root_ca_cert" \
           "$root_ca_pass" "$root_ca_salt" "$root_no_argon" \
-          "$set_as_default" "$set_as_defaultRoot"
+          "$set_as_default" "$set_as_defaultRoot" "" "$use_rsa"
         ;;
 
       create-key)
         shift
         key_name="" key_out="" password=""
-        salt_out="" no_argon=""
+        salt_out="" no_argon="" use_rsa=""
         while [ $# -gt 0 ]; do
           case "$1" in
             --name|--key-name|--keyname) key_name="$2"; shift 2;;
@@ -397,6 +398,7 @@ case "$1" in
             --password|--pass) password="$2"; shift 2;;
             --salt|--saltout|--salt-out) salt_out="$2"; shift 2;;
             --noargon|--no-argon|--pbkdf2) no_argon=true; shift;;
+            --rsa|--usersa|-rsa|--use-rsa) use_rsa=true; shift;;
             -h|--help|-help) shorthelp "ssl create-key"; exit 0;;
             *) echoe "Unknown command: $1" && shorthelp "ssl create-key"; exit 1;;
           esac
@@ -404,14 +406,14 @@ case "$1" in
         create_private_key \
             "$key_name" "$key_out" \
             "$password" "$salt_out" \
-            "$no_argon"
+            "$no_argon" "$use_rsa"
         ;;
 
       create-csr)
         shift
         key_name="" key_file="" csr_out="" cfg_out="" domains=""
         ips="" common_name="" client="true" server="false" password="" salt=""
-        email="" crldist="" country="" state="" locality="" organization="" orgunit=""
+        email="" crldist="" country="" state="" locality="" organization="" orgunit="" use_rsa=""
         while [ $# -gt 0 ]; do
           case "$1" in
             --keyname|--key-name|--name) key_name="$2"; shift 2;;
@@ -432,6 +434,7 @@ case "$1" in
             --locality|-L) locality="$2"; shift 2;;
             --org|-O) organization="$2"; shift 2;;
             --orgunit|-OU|--OU) orgunit="$2"; shift 2;;
+            --rsa|--usersa|-rsa|--use-rsa) use_rsa=true; shift;;
             -h|--help|-help) shorthelp "ssl create-csr"; exit 0;;
             *) echoe "Unknown command: $1"; shorthelp "ssl create-csr"; exit 1;;
           esac
@@ -441,7 +444,7 @@ case "$1" in
           "$csr_out" "$cfg_out" "$domains" "$ips" \
           "$client" "$server" "$email" "$country" \
           "$state" "$locality" "$organization" "$orgunit" \
-          "$common_name" "$crldist"
+          "$common_name" "$crldist" "$use_rsa"
         ;;
 
       sign-csr|create-cert)
