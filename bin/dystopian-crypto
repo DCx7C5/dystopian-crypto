@@ -26,9 +26,9 @@ DC_CFGDIR="$DYSTOPIAN_CFGDIR/crypto"
 DC_DATADIR="$DYSTOPIAN_DATADIR/crypto"
 DC_CA="$DC_CFGDIR/ca"
 DC_CERT="$DC_CFGDIR/cert"
-DC_KEY="$DC_CFGDIR/private"
+DC_KEY="$DC_CFGDIR/cert/private"
 DC_CRL="$DC_CFGDIR/crl"
-DC_CAKEY="$DC_CFGDIR/private"
+DC_CAKEY="$DC_CFGDIR/ca/private"
 DC_OLD="$DC_CFGDIR/old"
 DC_GNUPG="$DC_CFGDIR/gnupg"
 DC_DB="$DC_DATADIR/data.json"
@@ -173,6 +173,11 @@ SSL Commands:
     --scan-depth <number>:              (Optional) Directory scan depth for import
     --copy-files:                       (Optional) Copy files instead of moving
     --move-files:                       (Optional) Move files instead of copying
+
+  ssl install <trust/docker>
+    --name <string>:
+    --stores <str,str,...>
+
 
 GPG Commands:
 
