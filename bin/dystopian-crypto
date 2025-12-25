@@ -128,6 +128,7 @@ SSL Commands:
     --locality <string>:                (Optional) City or locality
     --org <string>:                     (Optional) Organization name
     --orgunit <string>:                 (Optional) Organizational unit
+    --rsa|--usersa|-rsa|--use-rsa:      (Optional) Uses RSA instead of Elliptic Curve (default: false)
 
   ssl sign-csr                        Sign a Certificate Signing Request (CSR) to create a certificate
     --name <string>:                    (Optional) Name for the CSR
