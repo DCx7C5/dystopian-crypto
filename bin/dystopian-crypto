@@ -722,17 +722,27 @@ case "$1" in
 
       install)
         shift
-        client=""
-        server=""
-        while [ $# -gt 0 ]; do
-          case "$1" in
-            --docker-client-cert) client=true; shift;;
-            --docker-server-cert) server=true; shift;;
-            -help|--help|-h) shorthelp "ssl install"; exit 0;;
-            *) echo "Unknown option: $1"; shorthelp "ssl install"; exit 1;;
-          esac
-        done
-        install_docker_cert "$client" "$server"
+        system_trust="false" firefox_trust="" chrome_trust=""
+        case "$1" in
+          docker)
+            shift
+            client="" server=""
+            ;;
+          trust)
+            shift
+            name="" stores=""
+            while [ $# -gt 0 ]; do
+              case "$1" in
+                --name) name="$2"; shift;;
+                --stores) stores="$2"; shift;;
+                *) echoe "Unknown command: $1"; shorthelp "ssl install"; exit 1;;
+              esac
+            done
+            install_truststore "$name" "$stores"
+            ;;
+          -help|--help|-h) shorthelp "ssl install"; exit 0;;
+          *) echo "Unknown option: $1"; shorthelp "ssl install"; exit 1;;
+        esac
         ;;
       -h|--help|-help|help) sslhelp; exit 0;;
       *) echoe "Unknown SSL command: $1"; sslhelp; exit 1;;
