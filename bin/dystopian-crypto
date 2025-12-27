@@ -507,17 +507,17 @@ case "$1" in
 
       verify-cert|verify)
         shift
-        cert_file="" ca_cert=""
-        cert_chain="" check_expiry="true"
+        name_cert="" caname_cacert="" check_expiry=""
         while [ $# -gt 0 ]; do
           case "$1" in
-            --cert) cert_file="$2"; shift 2;;
-            --ca) ca_cert="$2"; shift 2;;
-            -h|--help|-help) shorthelp "ssl verify-cert"; exit 0;;
-            *) echoe "Unknown command: $1"; shorthelp "ssl verify-cert"; exit 1;;
+            --cert|-c|-n|--name|-i|--index) name_cert="$2"; shift 2;;
+            --ca|-ca|-can|-cai|--caindex|--caidx|-caidx) caname_cacert="$2"; shift 2;;
+            --no-check-expiry|-nce|--nce|-ne|--ne) check_expiry=false; shift;;
+            -h|--help|-help) shorthelp "ssl verify"; exit 0;;
+            *) echoe "Unknown command: $1"; shorthelp "ssl verify"; exit 1;;
           esac
         done
-        verify_certificate_or_key "$cert_file" "$ca_cert"
+        verify_certificate_or_key "$name_cert" "$caname_cacert" "$check_expiry"
         ;;
 
       list-ca)
