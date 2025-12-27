@@ -74,211 +74,212 @@ Description:
 
 SSL Commands:
 
-  ssl create-ca                       Create a Root or Intermediate Certificate Authority
-    --name <string>:                    (Required) Common Name (CN) for the CA
-    --cert <file>:                      (Optional) Output certificate file (default: ca.pem or intermediate-ca.pem)
-    --key <file>:                       (Optional) Output private key file (default: ca-key.pem or intermediate-ca-key.pem)
-    --password <file|string>:           (Optional) Password for private key encryption (default: Argon2id)
-    --salt <file>:                      (Optional) Output file for salt
-    --no-argon:                         (Optional) Use PBKDF2 instead of Argon2id for key derivation
-    --config <file>:                    (Optional) Output configuration file
-    --csr <file>:                       (Optional) Output CSR file
-    --keep-csr:                         (Optional) Retain CSR after certificate creation
-    --email <string>:                   (Optional) Email address for certificate
-    --country <string>:                 (Optional) Country code (e.g., US, DE)
-    --state <string>:                   (Optional) State or province
-    --locality <string>:                (Optional) City or locality
-    --org <string>:                     (Optional) Organization name
-    --orgunit <string>:                 (Optional) Organizational unit
-    --days <number>:                    (Optional) Certificate validity in days (default: 3650)
-    --intermediate:                     (Optional) Create intermediate CA instead of root CA
-    --root-ca <string>:                 (Optional) Root CA Common Name (for intermediate CA)
-    --root-ca-key <file>:               (Optional) Root CA private key file
-    --root-ca-cert <file>:              (Optional) Root CA certificate file
-    --root-ca-pass <file|string>:       (Optional) Root CA private key password
-    --root-ca-salt <file>:              (Optional) Root CA salt file
-    --set-as-default:                   (Optional) Set as default CA
-    --set-as-defaultRoot:               (Optional) Set as default root CA
-    --rsa|--usersa|-rsa|--use-rsa:      (Optional) Uses RSA instead of Elliptic Curve (default: false)
+  ssl create-ca                                         Create a Root or Intermediate Certificate Authority
+    --name <string>:                                      (Required) Common Name (CN) for the CA
+    --cert <file>:                                        (Optional) Output certificate file (default: ca.pem or intermediate-ca.pem)
+    --key <file>:                                         (Optional) Output private key file (default: ca-key.pem or intermediate-ca-key.pem)
+    --password <file|string>:                             (Optional) Password for private key encryption (default: Argon2id)
+    --salt <file>:                                        (Optional) Output file for salt
+    --no-argon:                                           (Optional) Use PBKDF2 instead of Argon2id for key derivation
+    --config <file>:                                      (Optional) Output configuration file
+    --csr <file>:                                         (Optional) Output CSR file
+    --keep-csr:                                           (Optional) Retain CSR after certificate creation
+    --email <string>:                                     (Optional) Email address for certificate
+    --country <string>:                                   (Optional) Country code (e.g., US, DE)
+    --state <string>:                                     (Optional) State or province
+    --locality <string>:                                  (Optional) City or locality
+    --org <string>:                                       (Optional) Organization name
+    --orgunit <string>:                                   (Optional) Organizational unit
+    --days <number>:                                      (Optional) Certificate validity in days (default: 3650)
+    --intermediate:                                       (Optional) Create intermediate CA instead of root CA
+    --root-ca <string>:                                   (Optional) Root CA Common Name (for intermediate CA)
+    --root-ca-key <file>:                                 (Optional) Root CA private key file
+    --root-ca-cert <file>:                                (Optional) Root CA certificate file
+    --root-ca-pass <file|string>:                         (Optional) Root CA private key password
+    --root-ca-salt <file>:                                (Optional) Root CA salt file
+    --set-as-default:                                     (Optional) Set as default CA
+    --set-as-defaultRoot:                                 (Optional) Set as default root CA
+    --rsa|--usersa|-rsa|--use-rsa:                        (Optional) Uses RSA instead of Elliptic Curve (default: false)
+    --install|--install-trust|--trusts|--trust            (Optional)
 
-  ssl create-key                      Create a private key
-    --name <string>:                    (Optional) Name for the key
-    --key <file>:                       (Optional) Output private key file
-    --password <file|string>:           (Optional) Password for private key encryption (default: Argon2id)
-    --salt <file>:                      (Optional) Output file for salt
-    --no-argon:                         (Optional) Use PBKDF2 instead of Argon2id for key derivation
-    --rsa|--usersa|-rsa|--use-rsa:      (Optional) Uses RSA instead of Elliptic Curve (default: false)
+  ssl create-key                                        Create a private key
+    --name <string>:                                      (Optional) Name for the key
+    --key <file>:                                         (Optional) Output private key file
+    --password <file|string>:                             (Optional) Password for private key encryption (default: Argon2id)
+    --salt <file>:                                        (Optional) Output file for salt
+    --no-argon:                                           (Optional) Use PBKDF2 instead of Argon2id for key derivation
+    --rsa|--usersa|-rsa|--use-rsa:                        (Optional) Uses RSA instead of Elliptic Curve (default: false)
 
-  ssl create-csr                      Create a Certificate Signing Request (CSR)
-    --name <string>:                    (Optional) Name for the key
-    --key <file>:                       (Optional) Private key file
-    --csr <file>:                       (Optional) Output CSR file
-    --config <file>:                    (Optional) Output configuration file
-    --domains <string>:                 (Optional) Comma-separated list of domains
-    --ips <string>:                     (Optional) Comma-separated list of IP addresses
-    --cn <string>:                      (Optional) Common Name (CN) for the CSR
-    --client:                           (Optional) Create CSR for client certificate (default: true)
-    --server:                           (Optional) Create CSR for server certificate
-    --pass <file|string>:               (Optional) Password for private key
-    --salt <file>:                      (Optional) Output file for salt
-    --mail <string>:                    (Optional) Email address for certificate
-    --crldist <string>:                 (Optional) CRL distribution point
-    --country <string>:                 (Optional) Country code (e.g., US, DE)
-    --state <string>:                   (Optional) State or province
-    --locality <string>:                (Optional) City or locality
-    --org <string>:                     (Optional) Organization name
-    --orgunit <string>:                 (Optional) Organizational unit
-    --rsa|--usersa|-rsa|--use-rsa:      (Optional) Uses RSA instead of Elliptic Curve (default: false)
+  ssl create-csr                                        Create a Certificate Signing Request (CSR)
+    --name <string>:                                      (Optional) Name for the key
+    --key <file>:                                         (Optional) Private key file
+    --csr <file>:                                         (Optional) Output CSR file
+    --config <file>:                                      (Optional) Output configuration file
+    --domains <string>:                                   (Optional) Comma-separated list of domains
+    --ips <string>:                                       (Optional) Comma-separated list of IP addresses
+    --cn <string>:                                        (Optional) Common Name (CN) for the CSR
+    --client:                                             (Optional) Create CSR for client certificate (default: true)
+    --server:                                             (Optional) Create CSR for server certificate
+    --pass <file|string>:                                 (Optional) Password for private key
+    --salt <file>:                                        (Optional) Output file for salt
+    --mail <string>:                                      (Optional) Email address for certificate
+    --crldist <string>:                                   (Optional) CRL distribution point
+    --country <string>:                                   (Optional) Country code (e.g., US, DE)
+    --state <string>:                                     (Optional) State or province
+    --locality <string>:                                  (Optional) City or locality
+    --org <string>:                                       (Optional) Organization name
+    --orgunit <string>:                                   (Optional) Organizational unit
+    --rsa|--usersa|-rsa|--use-rsa:                        (Optional) Uses RSA instead of Elliptic Curve (default: false)
 
-  ssl sign-csr                        Sign a Certificate Signing Request (CSR) to create a certificate
-    --name <string>:                    (Optional) Name for the CSR
-    --csr <file>:                       (Optional) Input CSR file
-    --caname <string>:                  (Optional) CA Common Name or index
-    --cacert <file>:                    (Optional) CA certificate file
-    --cakey <file>:                     (Optional) CA private key file
-    --cert <file>:                      (Optional) Output certificate file
-    --capass <file|string>:             (Optional) CA private key password
-    --casalt <file>:                    (Optional) CA salt file
-    --days <number>:                    (Optional) Certificate validity in days
-    --keep:                             (Optional) Retain both CSR and config files
-    --keepcsr:                          (Optional) Retain CSR file
-    --keepcfg:                          (Optional) Retain config file
-    --config <file>:                    (Optional) Configuration file
+  ssl sign-csr                                          Sign a Certificate Signing Request (CSR) to create a certificate
+    --name <string>:                                      (Optional) Name for the CSR
+    --csr <file>:                                         (Optional) Input CSR file
+    --caname <string>:                                    (Optional) CA Common Name or index
+    --cacert <file>:                                      (Optional) CA certificate file
+    --cakey <file>:                                       (Optional) CA private key file
+    --cert <file>:                                        (Optional) Output certificate file
+    --capass <file|string>:                               (Optional) CA private key password
+    --casalt <file>:                                      (Optional) CA salt file
+    --days <number>:                                      (Optional) Certificate validity in days
+    --keep:                                               (Optional) Retain both CSR and config files
+    --keepcsr:                                            (Optional) Retain CSR file
+    --keepcfg:                                            (Optional) Retain config file
+    --config <file>:                                      (Optional) Configuration file
 
-  ssl list-ca                         List Certificate Authorities
-    --type <all|root|intermediate>      (Optional) CA type to list (default: all)
-    --verbose                           (Optional) Show detailed information
+  ssl list-ca                                           List Certificate Authorities
+    --type <all|root|intermediate>                        (Optional) CA type to list (default: all)
+    --verbose                                             (Optional) Show detailed information
 
-  ssl show-ca                         Show detailed CA information
-    --index <index>                     (Required) CA index to show
-    --type <root|intermediate>          (Optional) CA type (default: root)
-    --cert                              (Optional) Show certificate details
+  ssl show-ca                                           Show detailed CA information
+    --index <index>                                       (Required) CA index to show
+    --type <root|intermediate>                            (Optional) CA type (default: root)
+    --cert                                                (Optional) Show certificate details
 
-  ssl create-config                   Create SSL configuration file for OpenSSL operations
-    --type <rootca|intca|client|server> (Required) Certificate type to generate config for
-    --domains-ips <string>              (Optional) Comma-separated domains/IPs (for server certs)
-    --email <string>                    (Optional) Email address for certificate
-    --country <string>                  (Optional) Country code (e.g., US, DE)
-    --state <string>                    (Optional) State or province
-    --locality <string>                 (Optional) City or locality
-    --organization <string>             (Optional) Organization name
-    --orgunit <string>                  (Optional) Organizational unit
-    --common-name <string>              (Optional) Common Name (CN) for the certificate
-    --crldistributionpoint <string>     (Optional) CRL distribution point URL
+  ssl create-config                                     Create SSL configuration file for OpenSSL operations
+    --type <rootca|intca|client|server>                   (Required) Certificate type to generate config for
+    --domains-ips <string>                                (Optional) Comma-separated domains/IPs (for server certs)
+    --email <string>                                      (Optional) Email address for certificate
+    --country <string>                                    (Optional) Country code (e.g., US, DE)
+    --state <string>                                      (Optional) State or province
+    --locality <string>                                   (Optional) City or locality
+    --organization <string>                               (Optional) Organization name
+    --orgunit <string>                                    (Optional) Organizational unit
+    --common-name <string>                                (Optional) Common Name (CN) for the certificate
+    --crldistributionpoint <string>                       (Optional) CRL distribution point URL
 
-  ssl export                          Export SSL certificates and keys
-    --name <string>:                    (Optional) Name for the certificate or key
-    --index <string>:                   (Optional) Index for export
-    --output <dir>:                     (Optional) Output directory for exported data (creates dir within output dir)
+  ssl export                                            Export SSL certificates and keys
+    --name <string>:                                      (Optional) Name for the certificate or key
+    --index <string>:                                     (Optional) Index for export
+    --output <dir>:                                       (Optional) Output directory for exported data (creates dir within output dir)
 
-  ssl import                          Import SSL certificates and keys
-    --import <file|dir>:                (Optional) Path to file or directory containing SSL data
-    --scan-depth <number>:              (Optional) Directory scan depth for import
-    --copy-files:                       (Optional) Copy files instead of moving
-    --move-files:                       (Optional) Move files instead of copying
+  ssl import                                            Import SSL certificates and keys
+    --import <file|dir>:                                  (Optional) Path to file or directory containing SSL data
+    --scan-depth <number>:                                (Optional) Directory scan depth for import
+    --copy-files:                                         (Optional) Copy files instead of moving
+    --move-files:                                         (Optional) Move files instead of copying
 
   ssl install <trust/docker>
     --name <string>:
     --stores <str,str,...>
 
+  ssl verify
+    --name | --cert <string/file>:                        (Required) Must be certificate file or name of certificate
+    --caname | --cacert <string/file>:                    (Optional/Required)
 
 GPG Commands:
 
-  gpg import                          Import GPG keys
-    --file <file|dir>:                  (Optional) Path to file or directory containing keys
-    --index <string>:                   (Optional) Index for key import
-    --pass <file|string>:               (Optional) Passphrase for encrypted keys
-    --scan-depth <number>:              (Optional) Directory scan depth for key import
-    --homedir <dir>:                    (Optional) GPG home directory
-    --delete:                           (Optional) Delete keys after import
+  gpg import                                            Import GPG keys
+    --file <file|dir>:                                    (Optional) Path to file or directory containing keys
+    --index <string>:                                     (Optional) Index for key import
+    --pass <file|string>:                                 (Optional) Passphrase for encrypted keys
+    --scan-depth <number>:                                (Optional) Directory scan depth for key import
+    --homedir <dir>:                                      (Optional) GPG home directory
+    --delete:                                             (Optional) Delete keys after import
 
-  gpg export                          Export GPG keypair
-    --fingerprint <string>:             (Optional) Fingerprint of the key to export
-    --name <string>:                    (Optional) Real name associated with the key
-    --key-id <string>:                  (Optional) Key ID to export
-    --index <string>:                   (Optional) Index for key export
-    --public <file>:                    (Optional) Output file for public key
-    --private <file>:                   (Optional) Output file for private key
-    --out <dir>:                        (Optional) Output directory for exported keys
-    --homedir <dir>:                    (Optional) GPG home directory
-    --passphrase <file|string>:         (Optional) Passphrase for private key
-    --no-armor:                         (Optional) Export keys in binary format
-    --no-openssl-encrypt:               (Optional) Disable OpenSSL encryption for private key
-    --with-subkeys:                     (Optional) Include subkeys in export
+  gpg export                                            Export GPG keypair
+    --fingerprint <string>:                               (Optional) Fingerprint of the key to export
+    --name <string>:                                      (Optional) Real name associated with the key
+    --key-id <string>:                                    (Optional) Key ID to export
+    --index <string>:                                     (Optional) Index for key export
+    --public <file>:                                      (Optional) Output file for public key
+    --private <file>:                                     (Optional) Output file for private key
+    --out <dir>:                                          (Optional) Output directory for exported keys
+    --homedir <dir>:                                      (Optional) GPG home directory
+    --passphrase <file|string>:                           (Optional) Passphrase for private key
+    --no-armor:                                           (Optional) Export keys in binary format
+    --no-openssl-encrypt:                                 (Optional) Disable OpenSSL encryption for private key
+    --with-subkeys:                                       (Optional) Include subkeys in export
 
-  gpg genpair                         Generate a GPG keypair
-    --name <string>:                    (Optional) Real name for primary key
-    --email <string>:                   (Optional) Email for primary key
-    --comment <string>:                 (Optional) Comment for primary key
-    --sname <string>:                   (Optional) Real name for signing subkey
-    --semail <string>:                  (Optional) Email for signing subkey
-    --scomment <string>:                (Optional) Comment for signing subkey
-    --ename <string>:                   (Optional) Real name for encryption subkey
-    --eemail <string>:                  (Optional) Email for encryption subkey
-    --ecomment <string>:                (Optional) Comment for encryption subkey
-    --aname <string>:                   (Optional) Real name for authentication subkey
-    --aemail <string>:                  (Optional) Email for authentication subkey
-    --acomment <string>:                (Optional) Comment for authentication subkey
-    --passphrase <file|string>:         (Optional) Passphrase for primary key
-    --spassphrase <file|string>:        (Optional) Passphrase for signing subkey
-    --epassphrase <file|string>:        (Optional) Passphrase for encryption subkey
-    --apassphrase <file|string>:        (Optional) Passphrase for authentication subkey
-    --expire <string>:                  (Optional) Expiry date for primary key
-    --sexpire <string>:                 (Optional) Expiry date for signing subkey
-    --eexpire <string>:                 (Optional) Expiry date for encryption subkey
-    --aexpire <string>:                 (Optional) Expiry date for authentication subkey
-    --homedir <dir>:                    (Optional) GPG home directory
-    --sign:                             (Optional) Enable signing capability
-    --encrypt:                          (Optional) Enable encryption capability
-    --auth:                             (Optional) Enable authentication capability
-    --no-subs:                          (Optional) Do not generate subkeys
-    --index <string>:                   (Optional) Index for keypair
+  gpg genpair                                           Generate a GPG keypair
+    --name <string>:                                      (Optional) Real name for primary key
+    --email <string>:                                     (Optional) Email for primary key
+    --comment <string>:                                   (Optional) Comment for primary key
+    --sname <string>:                                     (Optional) Real name for signing subkey
+    --semail <string>:                                    (Optional) Email for signing subkey
+    --scomment <string>:                                  (Optional) Comment for signing subkey
+    --ename <string>:                                     (Optional) Real name for encryption subkey
+    --eemail <string>:                                    (Optional) Email for encryption subkey
+    --ecomment <string>:                                  (Optional) Comment for encryption subkey
+    --aname <string>:                                     (Optional) Real name for authentication subkey
+    --aemail <string>:                                    (Optional) Email for authentication subkey
+    --acomment <string>:                                  (Optional) Comment for authentication subkey
+    --passphrase <file|string>:                           (Optional) Passphrase for primary key
+    --spassphrase <file|string>:                          (Optional) Passphrase for signing subkey
+    --epassphrase <file|string>:                          (Optional) Passphrase for encryption subkey
+    --apassphrase <file|string>:                          (Optional) Passphrase for authentication subkey
+    --expire <string>:                                    (Optional) Expiry date for primary key
+    --sexpire <string>:                                   (Optional) Expiry date for signing subkey
+    --eexpire <string>:                                   (Optional) Expiry date for encryption subkey
+    --aexpire <string>:                                   (Optional) Expiry date for authentication subkey
+    --homedir <dir>:                                      (Optional) GPG home directory
+    --sign:                                               (Optional) Enable signing capability
+    --encrypt:                                            (Optional) Enable encryption capability
+    --auth:                                               (Optional) Enable authentication capability
+    --no-subs:                                            (Optional) Do not generate subkeys
+    --index <string>:                                     (Optional) Index for keypair
 
-  gpg add-key                         Add a subkey to an existing GPG key
-    --index <string>:                   (Optional) Index for key
-    --homedir <dir>:                    (Optional) GPG home directory
-    --name <string>:                    (Optional) Real name for subkey
-    --email <string>:                   (Optional) Email for subkey
-    --comment <string>:                 (Optional) Comment for subkey
-    --uid <string>:                     (Optional) User ID for subkey
-    --fingerprint <string>:             (Optional) Fingerprint of parent key
-    --key-id <string>:                  (Optional) Key ID of parent key
-    --passphrase <file|string>:         (Optional) Passphrase for parent key
-    --subpassphrase <file|string>:      (Optional) Passphrase for subkey
-    --encrypt:                          (Optional) Enable encryption capability for subkey
-    --sign:                             (Optional) Enable signing capability for subkey
-    --auth:                             (Optional) Enable authentication capability for subkey
-    --expires <string>:                 (Optional) Expiry date for subkey
+  gpg add-key                                           Add a subkey to an existing GPG key
+    --index <string>:                                     (Optional) Index for key
+    --homedir <dir>:                                      (Optional) GPG home directory
+    --name <string>:                                      (Optional) Real name for subkey
+    --email <string>:                                     (Optional) Email for subkey
+    --comment <string>:                                   (Optional) Comment for subkey
+    --uid <string>:                                       (Optional) User ID for subkey
+    --fingerprint <string>:                               (Optional) Fingerprint of parent key
+    --key-id <string>:                                    (Optional) Key ID of parent key
+    --passphrase <file|string>:                           (Optional) Passphrase for parent key
+    --subpassphrase <file|string>:                        (Optional) Passphrase for subkey
+    --encrypt:                                            (Optional) Enable encryption capability for subkey
+    --sign:                                               (Optional) Enable signing capability for subkey
+    --auth:                                               (Optional) Enable authentication capability for subkey
+    --expires <string>:                                   (Optional) Expiry date for subkey
 
 Maintenance Commands:
-  show-index                          Show SSL index information
-    --keys                              (Optional) Show key entries
-    --ca                                (Optional) Show CA entries
-    --verbose                           (Optional) Show detailed information
-    --json                              (Optional) Output raw JSON index
+  show-index                                            Show SSL index information
+    --keys                                                (Optional) Show key entries
+    --ca                                                  (Optional) Show CA entries
+    --verbose                                             (Optional) Show detailed information
+    --json                                                (Optional) Output raw JSON index
 
-  cleanup                             Clean up dystopian-crypto files and index
-    --index <index>                     (Optional) Clean up specific index entry
-    --orphaned                          (Optional) Remove orphaned files not in index
-    --backups                           (Optional) Remove backup files
-    --dry-run                           (Optional) Show what would be cleaned without doing it
+  cleanup                                               Clean up dystopian-crypto files and index
+    --index <index>                                       (Optional) Clean up specific index entry
+    --orphaned                                            (Optional) Remove orphaned files not in index
+    --backups                                             (Optional) Remove backup files
+    --dry-run                                             (Optional) Show what would be cleaned without doing it
 
-  backup                              Create backup of dystopian-crypto directory
-    --out <file>                        (Optional) Backup output file (default: /tmp/dystopian-crypto-backup-YYYYMMDD_HHMMSS.tar)
-    --compress                          (Optional) Compress backup with gzip
-    --exclude-keys                      (Optional) Exclude private keys from backup
+  backup                                                Create backup of dystopian-crypto directory
+    --out <file>                                          (Optional) Backup output file (default: /tmp/dystopian-crypto-backup-YYYYMMDD_HHMMSS.tar)
+    --compress                                            (Optional) Compress backup with gzip
+    --exclude-keys                                        (Optional) Exclude private keys from backup
 
-  restore                             Restore dystopian-crypto directory from backup
-    --from <file>                       (Required) Backup file to restore from
-    --force                             (Optional) Force restore without confirmation
+  restore                                               Restore dystopian-crypto directory from backup
+    --from <file>                                         (Required) Backup file to restore from
+    --force                                               (Optional) Force restore without confirmation
 
-  set-default-ca                      Set default Certificate Authority
-    --index <index>                     (Required) CA index to set as default
-    --type <root|intermediate>          (Optional) CA type (default: root)
+  set-default-ca                                        Set default Certificate Authority
+    --index <index>                                       (Required) CA index to set as default
+    --type <root|intermediate>                            (Optional) CA type (default: root)
 
-  install                             Creates keys and certs and Integrates them in corresponding environment
-    --docker-client-cert
-    --docker-server-cert
 
 
 Other Commands:
@@ -292,10 +293,10 @@ Other Commands:
 
 Examples:
   # Create a root CA with encrypted private key
-  $0 ssl create-ca --name "My Root CA" --password mypassword
+  $0 ssl create-ca --name "My Root CA" --pass mypassword.txt
 
   # Create a server certificate CSR
-  $0 ssl create-csr --domains "example.com,192.168.1.100" --type server --key my.key --cn example.com
+  $0 ssl create-csr --domains "example.com" --ips "192.168.1.100" --type server --key my.key --cn example.com
 
   # List all Certificate Authorities
   $0 ssl list-ca --verbose
@@ -856,11 +857,11 @@ case "$1" in
             --spassphrase|--spass|--spassfile|--spass-file|-sp|--spf|-spf) spassphrase="$2"; shift 2;;
             --epassphrase|--epass|--epassfile|--epass-file|-ep|--epf|-epf) epassphrase="$2"; shift 2;;
             --apassphrase|--apass|--apassfile|--apass-file|-ap|--apf|-apf) apassphrase="$2"; shift 2;;
-            --encrypt|--enc) encrypt="true"; shift;;
-            --sign) sign="true"; shift;;
-            --auth) auth="true"; shift;;
+            --encrypt|--enc) encrypt=true; shift;;
+            --sign) sign=true; shift;;
+            --auth) auth=true; shift;;
             --expire) expiry_date="$2"; shift 2;;
-            --no-subs) no_subs="true"; shift;;
+            --no-subs) no_subs=true; shift;;
             --index|-i) index="$2"; shift 2;;
             -h|--help|-help) echoe "gpg genpair" && shorthelp "gpg genpair"; exit 0;;
             *) echoe "Unknown option: $1"; shorthelp "gpg genpair"; exit 1;;
