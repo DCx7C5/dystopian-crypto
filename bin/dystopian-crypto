@@ -382,7 +382,9 @@ case "$1" in
             --orgunit|-OU) orgunit="$2"; shift 2;;
             --days|-d) days="$2"; shift 2;;
             --rsa|--usersa|-rsa|--use-rsa) use_rsa=true; shift;;
-            --install|--install-trust|--trusts|--trust|--stores|-s|-t) case "$2" in --|-) stores=""; shift;; *) stores="$2"; shift 2;; esac;;
+            --install|--install-trust|--trusts|--trust|--stores|-s|-t)
+              case "$2" in "") stores="system,chrome,firefox"; shift;; *) stores="$2"; shift 2;; esac
+              ;;
             -h|--help|-help|help) shorthelp "ssl create-ca"; exit 0;;
             *) echoe "Unknown command: $1"; shorthelp "ssl create-ca"; exit 1;;
           esac
@@ -478,7 +480,9 @@ case "$1" in
             --keep) keep_csr="true"; keep_cfg="true"; shift;;
             --keepcsr) keep_csr="true"; shift;;
             --keepcfg) keep_cfg="true"; shift;;
-            --install|--install-trust|--trusts|--trust|--stores|-s|-t) case "$2" in --|-) stores=""; shift ;; *) stores="$2"; shift 2;; esac;;
+            --install|--install-trust|--trusts|--trust|--stores|-s|-t)
+              case "$2" in "") stores="system,chrome,firefox"; shift;; *) stores="$2"; shift 2;; esac
+              ;;
             -h|--help|-help) shorthelp "ssl sign-csr"; exit 0;;
             *) echoe "Unknown command: $1"; shorthelp "ssl sign-csr"; exit 1;;
           esac
