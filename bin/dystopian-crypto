@@ -766,6 +766,22 @@ case "$1" in
             shift
             client="" server=""
             ;;
+          fritzbox)
+            shift
+            host="" pass="" username="" certpass="" index=""
+            while [ $# -gt 0 ]; do
+              case "$1" in
+                -n|--name|-i|--index) index="$2"; shift 2;;
+                -h|--host) host="$2"; shift 2;;
+                -p|--pass) pass="$2"; shift 2;;
+                -cp|--certpass) certpass="$2"; shift 2;;
+                -u|--username|--user) username="$2"; shift 2;;
+                --help|-help) shorthelp "ssl install fritzbox"; exit 0;;
+                *) echoe "Unknown command: $1"; shorthelp "ssl install fritzbox"; exit 1;;
+              esac
+            done
+            install_to_fritzbox "$host" "$pass" "$username" "$certpass" "$index"
+            ;;
           -help|--help|-h) shorthelp "ssl install"; exit 0;;
           *) echo "Unknown option: $1"; shorthelp "ssl install"; exit 1;;
         esac
