@@ -13,9 +13,9 @@ DYSTOPIAN_CFGDIR="/etc/dystopian"
 DYSTOPIAN_LIBDIR="/usr/lib/dystopian"
 DYSTOPIAN_DATADIR="/var/lib/dystopian"
 DYSTOPIAN_USER="$([ -n "$SUDO_USER" ] && echo "$SUDO_USER" || echo "root")"
-DC_POS_ARGS=
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+VAR_LIB_FILE="$DYSTOPIAN_LIBDIR/libvariables.sh"
 HELPER_LIB_FILE="$DYSTOPIAN_LIBDIR/libhelper.sh"
 SSL_LIB_FILE="$DYSTOPIAN_LIBDIR/libssl.sh"
 GPG_LIB_FILE="$DYSTOPIAN_LIBDIR/libgpg.sh"
@@ -34,6 +34,7 @@ DC_GNUPG="$DC_CFGDIR/gnupg"
 DC_DB="$DC_DATADIR/data.json"
 DC_CFG_FILE="$DC_CFGDIR/default.conf"
 
+[ -f "$VAR_LIB_FILE" ] || VAR_LIB_FILE="$SCRIPT_DIR/../../dystopian-libs/lib/libvariables.sh"
 [ -f "$HELPER_LIB_FILE" ] || HELPER_LIB_FILE="$SCRIPT_DIR/../../dystopian-libs/lib/libhelper.sh"
 [ -f "$SSL_LIB_FILE" ] || SSL_LIB_FILE="$SCRIPT_DIR/../../dystopian-libs/lib/libssl.sh"
 [ -f "$GPG_LIB_FILE" ] || GPG_LIB_FILE="$SCRIPT_DIR/../../dystopian-libs/lib/libgpg.sh"
@@ -42,6 +43,8 @@ DC_CFG_FILE="$DC_CFGDIR/default.conf"
 [ -f "$DC_CFG_FILE" ] || DC_CFG_FILE="$SCRIPT_DIR/../conf/default.conf"
 
 # Source library files
+# shellcheck source=../../dystopian-libs/lib/libvariables.sh
+[ -f "$VAR_LIB_FILE" ] && . "$VAR_LIB_FILE"
 # shellcheck source=../../dystopian-libs/lib/libhelper.sh
 [ -f "$HELPER_LIB_FILE" ] && . "$HELPER_LIB_FILE"
 # shellcheck source=../../dystopian-libs/lib/libssl.sh
@@ -373,7 +376,7 @@ case "$1" in
             --root-ca-salt|--rootcasalt|--casalt|--ca-salt|--rs|-rs) root_ca_salt="$2"; shift 2;;
             --password|--pass|--passfile|--pass-file|-p) ca_pass="$2"; shift 2;;
             --saltout|--salt-out|--salt) ca_salt_out="$2"; shift 2;;
-            --no-argon|--noargon|--pbkdf2) no_argon="true"; shift;;
+            --no-argon|--noargon|--pbkdf2) no_argon=true; shift;;
             --email|-E|--mail|-m) email="$2"; shift 2;;
             --country|-C|-c) country="$2"; shift 2;;
             --state|-ST|--ST|-st) state="$2"; shift 2;;
@@ -426,7 +429,7 @@ case "$1" in
       create-csr)
         shift
         key_name="" key_file="" csr_out="" cfg_out="" domains=""
-        ips="" common_name="" client="true" server="false" password="" salt=""
+        ips="" common_name="" client="" server="" password="" salt=""
         email="" crldist="" country="" state="" locality="" organization="" orgunit=""
         while [ $# -gt 0 ]; do
           case "$1" in
@@ -437,8 +440,8 @@ case "$1" in
             --domains|--domain|-d) domains="$2"; shift 2;;
             --ips|-i|--ip) ips="$2"; shift 2;;
             --cn|-cn|--CN|-CN|--commonname|--common-name) common_name="$2"; shift 2;;
-            --client) client="true" server="false"; shift;;
-            --server) server="true" client="false"; shift;;
+            --client) client=true server=false; shift;;
+            --server) server=true client=false; shift;;
             --pass|-p|--pwfile|--pw-file|--pfile) password="$2"; shift 2;;
             --salt|-s|--saltfile|--salt-file) salt="$2"; shift 2;;
             --mail|-m|-E|-e) email="$2"; shift 2;;
@@ -491,7 +494,8 @@ case "$1" in
           "$csr_name" "$csr_file" "$cert_out" \
           "$ca_index" "$ca_cert_file" "$ca_key_file" \
           "$ca_pass" "$ca_salt" "$validity_days" \
-          "$keep_csr" "$keep_cfg" "$config_file" "$stores"
+          "$keep_csr" "$keep_cfg" "$config_file" \
+          "" "$stores"
         ;;
 
       set-as-default-CA|set-as-default)
