@@ -32,7 +32,7 @@ DC_CAKEY="$DC_CFGDIR/ca/private"
 DC_OLD="$DC_CFGDIR/old"
 DC_GNUPG="$DC_CFGDIR/gnupg"
 DC_DB="$DC_DATADIR/data.json"
-DC_CFG_FILE="$DC_CFGDIR/default.conf"
+DC_CFG_FILE="$DC_CFGDIR/crypto.conf"
 
 [ -f "$VAR_LIB_FILE" ] || VAR_LIB_FILE="$SCRIPT_DIR/../../dystopian-libs/lib/libvariables.sh"
 [ -f "$HELPER_LIB_FILE" ] || HELPER_LIB_FILE="$SCRIPT_DIR/../../dystopian-libs/lib/libhelper.sh"
@@ -40,7 +40,7 @@ DC_CFG_FILE="$DC_CFGDIR/default.conf"
 [ -f "$GPG_LIB_FILE" ] || GPG_LIB_FILE="$SCRIPT_DIR/../../dystopian-libs/lib/libgpg.sh"
 [ -f "$DCS_DB_LIB_FILE" ] || DCS_DB_LIB_FILE="$SCRIPT_DIR/../../dystopian-libs/lib/libssl-db.sh"
 [ -f "$DCG_DB_LIB_FILE" ] || DCG_DB_LIB_FILE="$SCRIPT_DIR/../../dystopian-libs/lib/libgpg-db.sh"
-[ -f "$DC_CFG_FILE" ] || DC_CFG_FILE="$SCRIPT_DIR/../conf/default.conf"
+[ -f "$DC_CFG_FILE" ] || DC_CFG_FILE="$SCRIPT_DIR/../conf/crypto.conf"
 
 # Source library files
 # shellcheck source=../../dystopian-libs/lib/libvariables.sh
@@ -55,14 +55,13 @@ DC_CFG_FILE="$DC_CFGDIR/default.conf"
 [ -f "$DCS_DB_LIB_FILE" ] && . "$DCS_DB_LIB_FILE"
 # shellcheck source=../../dystopian-libs/lib/libgpg-db.sh
 [ -f "$DCG_DB_LIB_FILE" ] && . "$DCG_DB_LIB_FILE"
-# shellcheck source=conf/crypto.config
+# shellcheck source=conf/crypto.conf
 [ -f "$DC_CFG_FILE" ] && . "$DC_CFG_FILE"
 trap on_exit EXIT
 
 : "${VERBOSE:=0}"
 : "${DEBUG:=0}"
 : "${QUIET:=0}"
-: "${USB_STORAGE:=0}"
 RAND="$(od -An -N2 -i /dev/urandom | tr -d ' ' | head -c 4)"
 
 
@@ -83,7 +82,6 @@ SSL Commands:
     --key <file>:                                         (Optional) Output private key file (default: ca-key.pem or intermediate-ca-key.pem)
     --password <file|string>:                             (Optional) Password for private key encryption (default: Argon2id)
     --salt <file>:                                        (Optional) Output file for salt
-    --no-argon:                                           (Optional) Use PBKDF2 instead of Argon2id for key derivation
     --config <file>:                                      (Optional) Output configuration file
     --csr <file>:                                         (Optional) Output CSR file
     --keep-csr:                                           (Optional) Retain CSR after certificate creation
@@ -184,9 +182,13 @@ SSL Commands:
     --name <string>:
     --stores <str,str,...>
 
-  ssl verify
+  ssl verify                                            Verify SSL certificates and keys
     --name | --cert <string/file>:                        (Required) Must be certificate file or name of certificate
     --caname | --cacert <string/file>:                    (Optional/Required)
+
+  set-default-ca                                        Set default Certificate Authority
+    --index <index>                                       (Required) CA index to set as default
+    --type <root|intermediate>                            (Optional) CA type (default: root)
 
 GPG Commands:
 
@@ -278,10 +280,6 @@ Maintenance Commands:
     --from <file>                                         (Required) Backup file to restore from
     --force                                               (Optional) Force restore without confirmation
 
-  set-default-ca                                        Set default Certificate Authority
-    --index <index>                                       (Required) CA index to set as default
-    --type <root|intermediate>                            (Optional) CA type (default: root)
-
 
 
 Other Commands:
@@ -351,9 +349,9 @@ case "$1" in
       create-ca)
         shift
         ca_name="" ca_cert_out="" ca_key_out="" ca_pass=""
-        ca_salt_out="" no_argon="" ca_conf_out="" ca_csr_out=""
+        ca_salt_out="" ca_conf_out="" ca_csr_out=""
         keep_ca_csr="" intermediate="" root_ca_name="" root_ca_key=""
-        root_ca_cert="" root_ca_pass="" root_ca_salt="" root_no_argon=""
+        root_ca_cert="" root_ca_pass="" root_ca_salt=""
         email="" country="" state="" locality="" organization=""
         orgunit="" days="" set_as_default="" set_as_defaultRoot=""
         use_rsa="" stores=""
@@ -375,7 +373,6 @@ case "$1" in
             --root-ca-salt|--rootcasalt|--casalt|--ca-salt|--rs|-rs) root_ca_salt="$2"; shift 2;;
             --password|--pass|--passfile|--pass-file|-p) ca_pass="$2"; shift 2;;
             --saltout|--salt-out|--salt) ca_salt_out="$2"; shift 2;;
-            --no-argon|--noargon|--pbkdf2) no_argon=true; shift;;
             --email|-E|--mail|-m) email="$2"; shift 2;;
             --country|-C|-c) country="$2"; shift 2;;
             --state|-ST|--ST|-st) state="$2"; shift 2;;
@@ -385,7 +382,10 @@ case "$1" in
             --days|-d) days="$2"; shift 2;;
             --rsa|--usersa|-rsa|--use-rsa) use_rsa=true; shift;;
             --install|--install-trust|--trusts|--trust|--stores|-s|-t)
-              case "$2" in "") stores="system,chrome,firefox"; shift;; *) stores="$2"; shift 2;; esac
+              case "${2:-}" in
+                "" | "--" | "-"* ) [ "${2:-}" = "--" ] && shift 2 || stores='sys'; shift;;
+                *) stores="$2"; shift 2;;
+              esac
               ;;
             -h|--help|-help|help) shorthelp "ssl create-ca"; exit 0;;
             *) echoe "Unknown command: $1"; shorthelp "ssl create-ca"; exit 1;;
@@ -393,27 +393,26 @@ case "$1" in
         done
         create_certificate_authority \
           "$ca_name" "$ca_key_out" "$ca_cert_out" \
-          "$ca_pass" "$ca_salt_out" "$no_argon" \
+          "$ca_pass" "$ca_salt_out" \
           "$ca_conf_out" "$ca_csr_out" "$keep_ca_csr" \
           "$intermediate" "$email" "$country" "$state" \
           "$locality" "$organization" "$orgunit" "$days" \
           "$root_ca_name" "$root_ca_key" "$root_ca_cert" \
-          "$root_ca_pass" "$root_ca_salt" "$root_no_argon" \
+          "$root_ca_pass" "$root_ca_salt" \
           "$set_as_default" "$set_as_defaultRoot" "" \
           "$use_rsa" "$stores"
         ;;
 
       create-key)
         shift
-        key_name="" key_out="" password=""
-        salt_out="" no_argon="" use_rsa=""
+        key_name="" key_out="" passphrase=""
+        salt_out="" use_rsa=""
         while [ $# -gt 0 ]; do
           case "$1" in
-            --name|--key-name|--keyname) key_name="$2"; shift 2;;
-            --out|--key|--keyout|--key-out) key_out="$2"; shift 2;;
-            --password|--pass) password="$2"; shift 2;;
-            --salt|--saltout|--salt-out) salt_out="$2"; shift 2;;
-            --noargon|--no-argon|--pbkdf2) no_argon=true; shift;;
+            -n|--name|--key-name|--keyname) key_name="$2"; shift 2;;
+            -o|--out|--key|--keyout|--key-out) key_out="$2"; shift 2;;
+            -p|--passphrase|--pass|--passfile) passphrase="$2"; shift 2;;
+            -s|--salt|--saltout|--salt-out) salt_out="$2"; shift 2;;
             --rsa|--usersa|-rsa|--use-rsa) use_rsa=true; shift;;
             -h|--help|-help) shorthelp "ssl create-key"; exit 0;;
             *) echoe "Unknown command: $1" && shorthelp "ssl create-key"; exit 1;;
@@ -421,27 +420,27 @@ case "$1" in
         done
         create_private_key \
             "$key_name" "$key_out" \
-            "$password" "$salt_out" \
-            "$no_argon" "$use_rsa"
+            "$passphrase" "$salt_out" \
+            "$use_rsa"
         ;;
 
       create-csr)
         shift
         key_name="" key_file="" csr_out="" cfg_out="" domains=""
-        ips="" common_name="" client="" server="" password="" salt=""
+        ips="" common_name="" client="" server="" passphrase="" salt=""
         email="" crldist="" country="" state="" locality="" organization="" orgunit=""
         while [ $# -gt 0 ]; do
           case "$1" in
-            --keyname|--key-name|--name) key_name="$2"; shift 2;;
+            --keyname|--key-name|--name|-n) key_name="$2"; shift 2;;
             --key|-k|-pk|--privatekey) key_file="$2"; shift 2;;
             --out|-o|--csr-out|--csrout) csr_out="$2"; shift 2;;
             --cfg-out|--cfgout|--cfg|--config|-c) cfg_out="$2"; shift 2;;
-            --domains|--domain|-d) domains="$2"; shift 2;;
-            --ips|-i|--ip) ips="$2"; shift 2;;
+            --domains|--domain|-d|-domain|-domains) domains="$2"; shift 2;;
+            --ips|-i|--ip|-ips|-ip) ips="$2"; shift 2;;
             --cn|-cn|--CN|-CN|--commonname|--common-name) common_name="$2"; shift 2;;
             --client) client=true server=false; shift;;
             --server) server=true client=false; shift;;
-            --pass|-p|--pwfile|--pw-file|--pfile) password="$2"; shift 2;;
+            --pass|-p|--pwfile|--pw-file|--pfile) passphrase="$2"; shift 2;;
             --salt|-s|--saltfile|--salt-file) salt="$2"; shift 2;;
             --mail|-m|-E|-e) email="$2"; shift 2;;
             --crldist|--crl) crldist="$2"; shift 2;;
@@ -455,7 +454,7 @@ case "$1" in
           esac
         done
         create_certificate_signing_request \
-          "$key_name" "$key_file" "$password" "$salt" \
+          "$key_name" "$key_file" "$passphrase" "$salt" \
           "$csr_out" "$cfg_out" "$domains" "$ips" \
           "$client" "$server" "$email" "$country" \
           "$state" "$locality" "$organization" "$orgunit" \
@@ -469,21 +468,24 @@ case "$1" in
         validity_days="" keep_csr="" keep_cfg="" config_file="" stores=""
         while [ $# -gt 0 ]; do
           case "$1" in
-            --keyname|--key-name|--name) csr_name="$2"; shift 2;;
+            -n|-i|--keyname|--key-name|--name) csr_name="$2"; shift 2;;
             --csr) csr_file="$2"; shift 2;;
             --caname|--ca-name|--caindex|--ca|--ci|-ca|-ci) ca_index="$2"; shift 2;;
             --cacert|--ca-cert) ca_cert_file="$2"; shift 2;;
             --cakey|--ca-key) ca_key_file="$2"; shift 2;;
             --out|--cert|--cert-out|--certout) cert_out="$2"; shift 2;;
-            --capass|--ca-pass|--pass) ca_pass="$2"; shift 2;;
+            -p|-cap|--cap|--capass|--ca-pass|--pass) ca_pass="$2"; shift 2;;
             --cfgfile|--cfg-file|--config|--configfile|--config-file|--cfg) config_file="$2"; shift 2;;
             --casalt|--ca-salt|--salt) ca_salt="$2"; shift 2;;
-            --days) validity_days="$2"; shift 2;;
+            -d|--days) validity_days="$2"; shift 2;;
             --keep) keep_csr="true"; keep_cfg="true"; shift;;
             --keepcsr) keep_csr="true"; shift;;
             --keepcfg) keep_cfg="true"; shift;;
             --install|--install-trust|--trusts|--trust|--stores|-s|-t)
-              case "$2" in "") stores="system,chrome,firefox"; shift;; *) stores="$2"; shift 2;; esac
+              case "${2:-}" in
+                "" | "--" | "-"* ) [ "${2:-}" = "--" ] && shift 2 || stores='system'; shift;;
+                *) stores="$2"; shift 2;;
+              esac
               ;;
             -h|--help|-help) shorthelp "ssl sign-csr"; exit 0;;
             *) echoe "Unknown command: $1"; shorthelp "ssl sign-csr"; exit 1;;
@@ -644,7 +646,7 @@ case "$1" in
         cfg_out=""
         while [ $# -gt 0 ]; do
           case "$1" in
-            --out|--cfgout|--cfg-out|--cfg) cfg_out="$2"; shift 2;;
+            -o|--out|--cfgout|--cfg-out|--cfg) cfg_out="$2"; shift 2;;
             --type|-t) type="$2"; shift 2;;
             --domains|-d|--domain) domains="$2"; shift 2;;
             --ips|-i|--ip) ips="$2"; shift 2;;
@@ -669,17 +671,16 @@ case "$1" in
 
       set-default-ca|--set-default-ca)
         shift
-        default_ca_index=""
-        default_ca_type=""
+        index="" type=""
         while [ $# -gt 0 ]; do
           case "$1" in
-            --index) default_ca_index="$2"; shift 2;;
-            --type) default_ca_type="$2"; shift 2;;
-            -help|--help|-h) shorthelp "ssl set-default-ca"; exit 0;;
+            -i|--index|-n|--name) index="$2"; shift 2;;
+            -t|--type) type="$2"; shift 2;;
+            -h|-help|--help) shorthelp "ssl set-default-ca"; exit 0;;
             *) echoe "Unknown option: $1"; shorthelp "ssl set-default-ca"; exit 1;;
           esac
         done
-        set_default_ca "$default_ca_index" "$default_ca_type"
+        set_default_ca "$index" "$type"
         ;;
 
       export)
@@ -720,18 +721,16 @@ case "$1" in
 
       kdf)
         shift
-        password="" salt="" no_argon=0
+        password="" salt=""
         while [ $# -gt 0 ]; do
           case "$1" in
             --pass) password="$2"; shift 2;;
             --salt) salt="$2"; shift 2;;
-            --pbkdf2|--no-argon) no_argon=1;;
             -h|--help|-help) shorthelp "ssl kdf"; exit 0;;
             *) echoe "Unknown command: $1"; shorthelp "ssl kdf"; exit 1;;
           esac
         done
-        [ "$no_argon" -eq 0 ] && _create_argon2id_derived_key_pw "$password" "$salt"
-        #[ "$no_argon" -ne 0 ] && _create_pbkdf2_derived_key_pw "$password"
+        derive_key_from_passphrase "$password" "$salt"
         ;;
 
       trust-dbs|trust-db|trustdb|trustdbs)
@@ -766,7 +765,7 @@ case "$1" in
             shift
             client="" server=""
             ;;
-          fritzbox)
+          fritzbox|fritz)
             shift
             host="" pass="" username="" certpass="" index=""
             while [ $# -gt 0 ]; do
@@ -793,27 +792,24 @@ case "$1" in
 
   gpg)
     shift
+    init_gpg_env
     case "$1" in
       import)
         shift
-        import_path="" index="" scan_depth=""
-        passphrase="" remove_keys="" homedir=""
+        import_path="" passphrase="" fingerprint=""
         while [ $# -gt 0 ]; do
           case "$1" in
             --file|--dir|-d|-f) import_path="$2"; shift 2;;
+            --keybase|--kb|-kb|--keyb) import_path="keybase"; shift;;
             --index|-i) index="$2"; shift 2;;
+            --fingerprint|--fpr|-fpr) fingerprint="$2"; shift 2;;
             --passfile|--pass-file|--pass|-p|-pf|--pf) passphrase="$2"; shift 2;;
-            --scandepth|--scan-depth|-sd|--sd) scan_depth="$2"; shift 2;;
             --homedir|--home) homedir="$2"; shift 2;;
-            --delete|--del|-del) remove_keys="true"; shift;;
             -h|--help|-help) shorthelp "gpg import"; exit 0;;
             *) echoe "Unknown option: $1"; shorthelp "gpg import"; exit 1;;
           esac
         done
-        gpg_import_keys \
-          "$import_path" "$passphrase" \
-          "$scan_depth" "$index" \
-          "$remove_keys" "$homedir"
+        gpg_import_keys "$import_path" "$passphrase" "$fingerprint"
         ;;
 
       export)
