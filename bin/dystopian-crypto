@@ -369,9 +369,9 @@ case "$1" in
             --root-ca|--rootca|--ca|--rn|-rn) root_ca_name="$2"; shift 2;;
             --root-ca-key|--rootcakey|--ca-key|--cakey|--rk|-rk) root_ca_key="$2"; shift 2;;
             --root-ca-cert|--rootcacert|--ca-cert|--cacert|--rc|-rc) root_ca_cert="$2"; shift 2;;
-            --root-ca-pass|--rootcapass|--ca-pass|--capass|--root-ca-password|--root-ca-passfile|--rp|-rp|--rpf|-rpf) root_ca_pass="$2"; shift 2;;
+            --root-ca-pass|--rootcapass|--ca-pass|--capass|--root-ca-password|--root-ca-passfile|--rp|-rp|--rpf|-rpf|-cap|--cap) root_ca_pass="$2"; shift 2;;
             --root-ca-salt|--rootcasalt|--casalt|--ca-salt|--rs|-rs) root_ca_salt="$2"; shift 2;;
-            --password|--pass|--passfile|--pass-file|-p) ca_pass="$2"; shift 2;;
+            --password|--pass|--passfile|--pass-file|-p|-pf|--pf) ca_pass="$2"; shift 2;;
             --saltout|--salt-out|--salt) ca_salt_out="$2"; shift 2;;
             --email|-E|--mail|-m) email="$2"; shift 2;;
             --country|-C|-c) country="$2"; shift 2;;
@@ -954,9 +954,10 @@ case "$1" in
   # Maintenance and utility commands
   --cleanup|cleanup)
     shift
-    cleanup_index="" cleanup_non_ca_keys="false"
-    cleanup_orphaned="false" cleanup_backups="false"
-    cleanup_dry_run="false" cleanup_keep_backups="false"
+    cleanup_index="" cleanup_non_ca_keys=""
+    cleanup_orphaned="" cleanup_backups=""
+    cleanup_dry_run="" cleanup_keep_backups=""
+    cleanup_passphrase="" cleanup_salt=""
     while [ $# -gt 0 ]; do
       case "$1" in
         --index|-i|--name|-n) cleanup_index="$2"; shift 2;;
@@ -965,6 +966,8 @@ case "$1" in
         --backups) cleanup_backups="true"; shift;;
         --dryrun|--dry-run) cleanup_dry_run="true"; shift;;
         --keepbkps|--keep-bkps) cleanup_keep_backups="true"; shift;;
+        --password|--pass|--passfile|--pass-file|-p|-pf|--pf) cleanup_passphrase="$2"; shift 2;;
+        --salt|-s|--saltfile|--salt-file) cleanup_salt="$2"; shift 2;;
         -h|--help|-help) shorthelp "cleanup"; exit 0;;
         *) echoe "Unknown option: $1"; shorthelp "cleanup"; exit 1;;
       esac
@@ -972,7 +975,8 @@ case "$1" in
     cleanup_dcrypto_files \
       "$cleanup_index" "$cleanup_orphaned" \
       "$cleanup_backups" "$cleanup_non_ca_keys" \
-      "$cleanup_dry_run" "$cleanup_keep_backups"
+      "$cleanup_dry_run" "$cleanup_keep_backups" \
+      "$cleanup_passphrase" "$cleanup_salt"
     ;;
 
   --show-index|show-index)
