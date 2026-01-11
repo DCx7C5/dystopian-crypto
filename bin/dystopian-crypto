@@ -727,13 +727,13 @@ case "$1" in
         password='' salt=''
         while [ $# -gt 0 ]; do
           case "$1" in
-            --pass) password="$2"; shift 2;;
-            --salt) salt="$2"; shift 2;;
+            --pass|-p) password="$2"; shift 2;;
+            --salt|-s) salt="$2"; shift 2;;
             -h|--help|-help) shorthelp "ssl kdf"; exit 0;;
             *) echoe "Unknown command: $1"; shorthelp "ssl kdf"; exit 1;;
           esac
         done
-        derive_key_from_passphrase "$password" "$salt"
+        derive_key_from_passphrase "$password" "$salt" && printf '\n'
         ;;
 
       trust-dbs|trust-db|trustdb|trustdbs)
