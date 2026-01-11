@@ -354,7 +354,7 @@ case "$1" in
         root_ca_cert='' root_ca_pass='' root_ca_salt=''
         email='' country='' state='' locality='' organization=''
         orgunit='' days='' set_as_default='' set_as_defaultRoot=''
-        fullchain_out='' use_rsa='' stores=''
+        fullchain_out='' use_rsa='' stores='' no_scrypt=''
         while [ $# -gt 0 ]; do
           case "${1}" in
             --certout|--cert-out|--cert|--crt|-crt) ca_cert_out="$2"; shift 2;;
@@ -382,6 +382,7 @@ case "$1" in
             --orgunit|-OU) orgunit="$2"; shift 2;;
             --days|-d) days="$2"; shift 2;;
             --rsa|--usersa|-rsa|--use-rsa) use_rsa=true; shift;;
+            --no-scrypt|--noscrypt|--pbkdf2|-pbkdf2|-noscrypt|-ns|--ns) no_scrypt=true; shift;;
             --install|--install-trust|--trusts|--trust|--stores|-s|-t)
               case "${2:-}" in
                 "" | "--" | "-"* ) [ "${2:-}" = "--" ] && shift 2 || stores='sys'; shift;;
@@ -401,13 +402,13 @@ case "$1" in
           "$root_ca_name" "$root_ca_key" "$root_ca_cert" \
           "$root_ca_pass" "$root_ca_salt" \
           "$set_as_default" "$set_as_defaultRoot" "$fullchain_out" \
-          "$use_rsa" "$stores"
+          "$use_rsa" "$stores" "$no_scrypt"
         ;;
 
       create-key)
         shift
         key_name='' key_out='' passphrase=''
-        salt_out='' use_rsa=''
+        salt_out='' use_rsa='' no_scrypt=''
         while [ $# -gt 0 ]; do
           case "$1" in
             -n|--name|--key-name|--keyname) key_name="$2"; shift 2;;
@@ -415,6 +416,7 @@ case "$1" in
             -p|--passphrase|--pass|--passfile) passphrase="$2"; shift 2;;
             -s|--salt|--saltout|--salt-out) salt_out="$2"; shift 2;;
             --rsa|--usersa|-rsa|--use-rsa) use_rsa=true; shift;;
+            --no-scrypt|--noscrypt|--pbkdf2|-pbkdf2|-noscrypt|-ns|--ns) no_scrypt=true; shift;;
             -h|--help|-help) shorthelp "ssl create-key"; exit 0;;
             *) echoe "Unknown command: $1" && shorthelp "ssl create-key"; exit 1;;
           esac
@@ -422,7 +424,7 @@ case "$1" in
         create_private_key \
             "$key_name" "$key_out" \
             "$passphrase" "$salt_out" \
-            "$use_rsa"
+            "$use_rsa" "$no_scrypt"
         ;;
 
       create-csr)
